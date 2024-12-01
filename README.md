@@ -13,7 +13,7 @@
 
 ### Deleted Cards
 
-- display the number of deleted cards
+- [x] display the number of deleted cards
 - reveal deleted cards after user clicks the "Reveal" button - deleted card variant shouldn't contain the description
 - write the code, so in the future you will be able to add "revert" functionality
 
