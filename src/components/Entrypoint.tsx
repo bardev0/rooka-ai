@@ -3,64 +3,77 @@ import { ListItem, useGetListData } from "../api/getListData";
 import { Card } from "./List";
 import { Spinner } from "./Spinner";
 import useCardStore from "../store.ts";
+import {ToggleButton} from "./Buttons.tsx";
 
 export const Entrypoint = () => {
   const listQuery = useGetListData();  // Assuming this fetches data
   const deletedCards = useCardStore((state) => state.deletedCards);
   const awesom = useCardStore((state) => state.awesomeList);
   const setAwesome = useCardStore((state) => state.setList);
+  const setDeletedCards = useCardStore((state) => state.setDeletedCards);
+  const areDeletedVisible = useCardStore((state) => state.areDeletedVisible);
+  const setDeletedVisible = useCardStore((state) => state.setDeletedVisibleS);
 
-  // if session storage exists load from session storage
-  // if not load form listQuery
-  //
+  useEffect(() => {
+    const awesomFromSession = sessionStorage.getItem("awesome");
+    const deletedCardsFromSession = sessionStorage.getItem("deletedCards");
 
-  let sS = sessionStorage.getItem("awesomeList");
-  console.log(sS)
+    console.log(sessionStorage.length)
+    if (sessionStorage.length >= 2) {
+      if (awesomFromSession != null) {
+        setAwesome(JSON.parse(awesomFromSession))
+      }
+      if (deletedCardsFromSession != null) {
+        setDeletedCards(JSON.parse(deletedCardsFromSession))
+      }
+    } else {
+        if (!listQuery.isLoading && listQuery.data) {
 
-  // useEffect(() => {
-  //   if (sS != undefined && sS != null) {
-  //     setAwesome(JSON.parse(sS));
-  //   } else {
-  //     if (!listQuery.isLoading && listQuery.data) {
-  //       setAwesome(listQuery.data)
-  //     }
-  //   }
-  //
-  // }, [listQuery.isLoading, listQuery.data]);
-  //
-  // if (sS == "") {
-  // }
-  // useEffect(() => {
-  //
-  // }, []);
-  //
-  // useEffect(() => {
-  //   setAwesome(awesom)
-  //   sessionStorage.clear()
-  //   sessionStorage.setItem("awesomeList", JSON.stringify(awesom));
-  // }, [awesom]);
-  //
+          let emptyMatrix: Array<ListItem> = []
+              listQuery.data.map( (data) => {
+                let toPush = data
+                toPush.isCollapsed = true
+                emptyMatrix.push(toPush)
+          } )
+          setAwesome(emptyMatrix)
+        }
+      }}, [listQuery.isLoading, listQuery.data]);
+
+  useEffect(() => {
+    setAwesome(awesom)
+  }, [awesom]);
+
+  useEffect(() => {
+    setDeletedCards(deletedCards)
+  }, [deletedCards]);
+
   if (listQuery.isLoading) {
     return <Spinner />;
   }
 
-  const refershBtn = () => {
-    listQuery.refetch()
+  const refreshBtn = () => {
+    setAwesome([])
+    setDeletedCards([])
+    sessionStorage.clear();
+    listQuery.refetch();
   }
 
+  const setDeletedStatus = () => {
+    setDeletedVisible(!areDeletedVisible)
+  }
   return (
       <div className="flex gap-x-16">
         <div className="w-full max-w-xl">
           <h1 className="inline-block mb-1 font-medium text-lg">My Awesome List ({awesom.length})</h1>
           <button
               className="iniline-block text-white text-sm transition-colors hover:bg-gray-800 disabled:bg-black/75 bg-black rounded px-3 py-1"
-
+              onClick={ () => refreshBtn()}
           >
             Refresh
           </button>
           <div className="flex flex-col gap-y-3">
             {awesom.map((card: ListItem, index: number) => (
-                <Card key={card.id} id={index} title={card.title} description={card.description}/>
+                <Card areAwesome={true} key={card.id} id={index} title={card.title} description={card.description} isCollapsed={card.isCollapsed}/>
             ))}
           </div>
         </div>
@@ -69,18 +82,20 @@ export const Entrypoint = () => {
           <div>
             <h1 className="inline-block mb-1 font-medium text-lg">Deleted Cards ({deletedCards.length})</h1>
             <button
-                disabled
                 className="iniline-block text-white text-sm transition-colors hover:bg-gray-800 disabled:bg-black/75 bg-black rounded px-3 py-1"
+                onClick={ () => setDeletedStatus() }
             >
               Reveal
             </button>
 
           </div>
-          <div className="flex flex-col gap-y-3">
+          {areDeletedVisible ? <div className="flex flex-col gap-y-3">
             {deletedCards.map((card: ListItem, index: number) => (
-                <Card key={card.id}  id={index} title={card.title} description={card.description}/>
+                <Card areAwesome={false} key={card.id} id={index} title={card.title} description={card.description}
+                      isCollapsed={card.isCollapsed}/>
             ))}
-          </div>
+          </div> : <p></p>}
+
 
         </div>
 

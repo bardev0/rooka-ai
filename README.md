@@ -14,18 +14,18 @@
 ### Deleted Cards
 
 - [x] display the number of deleted cards
-- reveal deleted cards after user clicks the "Reveal" button - deleted card variant shouldn't contain the description
+- [x] reveal deleted cards after user clicks the "Reveal" button - deleted card variant shouldn't contain the description
 - write the code, so in the future you will be able to add "revert" functionality
 
 ### Behavior
 
 - cards by default should be collapsed
-- expanded/deleted cards' state needs to be persisted after "refreshing" (regardless of isVisible property)
-- "refresh" functionality needs to be implemented using `react-query`
+- [x] expanded/deleted cards' state needs to be persisted after "refreshing" (regardless of isVisible property)
+- [x] "refresh" functionality needs to be implemented using `react-query`
 
 ### Miscellaneous
 
-- add a "Refresh" button (just like the "Reveal" button)
+- [x] add a "Refresh" button (just like the "Reveal" button)
 - create generic `<ToggleButton />`
 
 ### Additional
